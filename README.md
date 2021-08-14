@@ -1,1 +1,20 @@
-# RealEstatePricingModel
+# Real Estate Pricing Model
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
