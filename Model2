@@ -1,0 +1,34 @@
+library(readxl)
+library(ggplot2)
+library(car)
+
+data <- read_excel("~/Desktop/計量_final/model_data.xlsx")
+head(data)
+
+Price_2 <- (data$Price)^(1/2)
+model2 <- lm(Price_2 ~ Dist_Code_1 + Dist_Code_2 + Dist_Code_3 +
+                Dist_Code_5 + Dist_Code_7 + Dist_Code_8 + Dist_Code_9 + Dist_Code_10 +
+                Dist_Code_11 + Land_Size + Building_Size + Type_1 + Type_2 + Type_3 +
+                Age + Floor + Park + (Floor)*(elevator), data = data)
+summary(model2)
+
+#殘差分析(繪圖)
+names(model2)
+plot(model2$fitted.values, model2$residuals)
+
+#殘差分析(常態) H0:殘差服從常態分配
+shapiro.test(model2$residuals)
+
+#殘差分析(獨立性) H0:殘差間相互獨立
+durbinWatsonTest(model2) 
+
+#殘差分析(異質性) H0:殘差變異數具有同質性
+ncvTest(model2)
+
+#Heteroskedasticity
+fitted.values_2<-(model2$fitted.values)*(model2$fitted.values)
+model2_1 <- lm(model2$residuals ~ model2$fitted.values + fitted.values_2)
+summary(model2_1)
+
+
+
