@@ -1,0 +1,58 @@
+library(readxl)
+library(ggplot2)
+library(car)
+
+data <- read_excel("~/Desktop/計量_final/model_data.xlsx")
+head(data)
+
+Price_2 <- (data$Price)^(1/2)
+Land_Size_2 <- (data$Land_Size)^2
+Building_Size_2 <- (data$Building_Size)^2
+Age_2 <- (data$Age)^2
+Floor_2 <- (data$Floor)^2
+
+model3_0 <- lm(Price_2 ~ Dist_Code_1 + Dist_Code_2 + Dist_Code_3 +
+               Dist_Code_5 + Dist_Code_7 + Dist_Code_8 + Dist_Code_9 + Dist_Code_10 +
+               Dist_Code_11 + Land_Size + Land_Size_2 + Building_Size + Building_Size_2 + Type_1 + Type_2 + Type_3 +
+               Age + Age_2 + Floor + Floor_2 + Park + (Floor)*(elevator) , data = data)
+summary(model3_0)
+
+#殘差分析(繪圖)
+names(model3_0)
+plot(model3_0$fitted.values, model3_0$residuals)
+
+#殘差分析(常態) H0:殘差服從常態分配
+shapiro.test(model3_0$residuals)
+
+#殘差分析(獨立性) H0:殘差間相互獨立
+durbinWatsonTest(model3_0) 
+
+#殘差分析(異質性) H0:殘差變異數具有同質性
+ncvTest(model3_0)
+
+model3 <- lm(log(Price) ~ Dist_Code_1 + Dist_Code_2 + Dist_Code_3 +
+               Dist_Code_5 + Dist_Code_7 + Dist_Code_8 + Dist_Code_9 + Dist_Code_10 +
+               Dist_Code_11 + Land_Size + Building_Size + Type_1 + Type_2 + Type_3 +
+               Age + Floor + Park + (Floor)*(elevator) +
+               Land_Size_2 + Building_Size_2 + Age_2 + Floor_2, data = data)
+summary(model3)
+
+#殘差分析(繪圖)
+names(model3)
+plot(model3$fitted.values, model3$residuals)
+
+#殘差分析(常態) H0:殘差服從常態分配
+shapiro.test(model3$residuals)
+
+#殘差分析(獨立性) H0:殘差間相互獨立
+durbinWatsonTest(model3) 
+
+#殘差分析(異質性) H0:殘差變異數具有同質性
+ncvTest(model3)
+
+#Heteroskedasticity
+fitted.values_3<-(model3$fitted.values)*(model3$fitted.values)
+model3_1 <- lm(model3$residuals ~ model3$fitted.values + fitted.values_3)
+summary(model3_1)
+
+
